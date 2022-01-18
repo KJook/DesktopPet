@@ -1,7 +1,8 @@
+from pickle import TRUE
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
-from PyQt5.QtGui import QMovie, QIcon, QCursor, QColor, QFont
+from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
 import threading
 import random
 import subprocess
@@ -65,7 +66,6 @@ class root(QMainWindow):
         self.repaint()
         # 创建label盛放pet
 
-
         # 初始化标签控件
         self.labelMessage = QTextBrowser(self)
         self.labelMessage.setVisible(False)
@@ -84,10 +84,35 @@ class root(QMainWindow):
         self.label.move(25, 50)
 
         # 使pet在label中显示出来
-        '''self.gif = QMovie('./pets/' + str(self.petList[self.petNum]) + '.gif')
-        self.label.setMovie(self.gif)
-        self.gif.start()'''
         self.randomPet()
+        self.actionInit()
+        # Timer
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.randomPet)
+        self.timer.start(10000)
+
+        # 最小化到托盘
+        self.tray_icon_menu = QMenu(self)
+        self.tray_icon_menu.addAction(self.petShow)
+        self.tray_icon_menu.addAction(self.Quit)
+        self.tray_icon = QSystemTrayIcon(self)
+        self.trayIcon = QIcon('./resourses/ico.png')
+        self.tray_icon.setIcon(self.trayIcon)
+        self.tray_icon.setContextMenu(self.tray_icon_menu)
+        self.tray_icon.show()
+        self.show()
+
+    def contextMenuEvent(self, event):
+        cmenu = QMenu(self)
+        hideAction = cmenu.addAction(self.petHide)
+        clearAction = cmenu.addAction(self.Clear)
+        shotAction = cmenu.addAction(self.shot)
+        decodeAction = cmenu.addAction(self.urlaction)
+        wenkuAction = cmenu.addAction(self.library)
+        quitAction = cmenu.addAction(self.Quit)
+        action = cmenu.exec_(self.mapToGlobal(event.pos()))
+    
+    def actionInit(self):
         # 退出功能的定义
         self.Quit = QAction('退出', self, triggered=qApp.quit)
         self.Quit_Icon = QIcon('./resourses/exit.png')
@@ -108,21 +133,18 @@ class root(QMainWindow):
         self.library = QAction('文库', self, triggered=self.baidu)
         self.lib_icon = QIcon('./resourses/wenku.ico')
         self.library.setIcon(self.lib_icon)
+        # 隐藏
+        self.petHide = QAction('隐藏', self, triggered=self.pHide)
+        self.petHide_icon = QIcon('./resourses/hide.png')
+        self.petHide.setIcon(self.petHide_icon)
+        # 显示
+        self.petShow = QAction('显示', self, triggered=self.pShow)
+        self.petShow_icon = QIcon('./resourses/show.png')
+        self.petShow.setIcon(self.petShow_icon)
 
-        # Timer
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.randomPet)
-        self.timer.start(10000)
-        # 最小化到托盘
-        self.tray_icon_menu = QMenu(self)
-        self.tray_icon_menu.addAction(self.Quit)
-        self.tray_icon = QSystemTrayIcon(self)
-        self.trayIcon = QIcon('./resourses/ico.png')
-        self.tray_icon.setIcon(self.trayIcon)
-        self.tray_icon.setContextMenu(self.tray_icon_menu)
-        self.tray_icon.show()
-        self.show()
-
+    def pShow(self):
+        self.setVisible(True)
+    
     def baidu(self):
         client_th = threading.Thread(target=self.wenku_decode)
         client_th.setDaemon(True)
@@ -147,18 +169,13 @@ class root(QMainWindow):
         self.gif.start()
         self.label.update()
 
+    def pHide(self):
+        self.setVisible(False)
+    
     def randomPet(self):
         self.petNum = random.randint(0, len(self.petCostom) - 1)
         self.setPet(self.petCostom[self.petNum])
 
-    def contextMenuEvent(self, event):
-        cmenu = QMenu(self)
-        quitAction = cmenu.addAction(self.Quit)
-        clearAction = cmenu.addAction(self.Clear)
-        shotAction = cmenu.addAction(self.shot)
-        decodeAction = cmenu.addAction(self.urlaction)
-        wenkuAction = cmenu.addAction(self.library)
-        action = cmenu.exec_(self.mapToGlobal(event.pos()))
 
     def screenshot(self):
         subprocess.run('./script/screenshot.exe')

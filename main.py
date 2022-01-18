@@ -4,10 +4,6 @@ from PyQt5.QtWidgets import QApplication
 import sys
 import threading
 
-import logging
-import logging.handlers
-from logging import Formatter
-
 
 flask_app = Flask(__name__)
 
