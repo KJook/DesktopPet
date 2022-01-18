@@ -1,13 +1,12 @@
-from calendar import calendar
-from dis import dis
-from turtle import clear
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
-from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal
+from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
+from PyQt5 import QtMultimedia
+from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QColor, QFont
 import threading
 import random
 import subprocess
 import threading
+import time
 
 class MySignals(QObject):
     # 定义一种信号，两个参数 类型分别是： QTextBrowser 和 字符串
@@ -18,6 +17,14 @@ class MySignals(QObject):
 
 gs = MySignals()
 
+def playMeow():
+    file = QUrl.fromLocalFile('./resourses/meow.mp3') # 音频文件路径
+    content = QtMultimedia.QMediaContent(file)
+    player = QtMultimedia.QMediaPlayer()
+    player.setMedia(content)
+    player.setVolume(50.0)
+    player.play()
+    time.sleep(1) #设置延时等待音频播放结束
 
 class root(QMainWindow):
     def __init__(self):
@@ -44,6 +51,8 @@ class root(QMainWindow):
 
     def clear(self):
         self.labelMessage.clear()
+        self.labelMessage.setVisible(False)
+        self.isMouseEnter = False
         self.labelMessage.setAlignment(Qt.AlignCenter)
 
 
@@ -177,6 +186,9 @@ class root(QMainWindow):
         self.is_follow_mouse = False
         self.setPet(self.petHello[random.randint(0, len(self.petHello) - 1)])
         self.setCursor(QCursor(Qt.ArrowCursor))
+
+    def mouseDoubleClickEvent(self, event):
+        self.clear()
 
     def enterEvent(self, event):
         if not self.labelMessage.toPlainText() == "":

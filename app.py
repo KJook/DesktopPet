@@ -1,6 +1,9 @@
 from flask import Flask, jsonify, request
-from window import *
+from window import root, gs, playMeow
+from PyQt5.QtWidgets import QApplication
 import sys
+import threading
+
 
 flask_app = Flask(__name__)
 
@@ -9,6 +12,9 @@ def say():
     post_str=request.form['str']
     try:
         gs.print.emit(post_str)
+        meow_thread = threading.Thread(target=playMeow())
+        meow_thread.setDaemon(True)
+        meow_thread.start()
         return jsonify({
             "code": 0,
             "state": "ok"
