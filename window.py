@@ -120,7 +120,7 @@ class root(QMainWindow):
         client_th.start()
 
     def wenku_decode(self):
-        subprocess.run('wenku.exe')
+        subprocess.run('./script/wenku.exe')
 
     def decode(self):
         client_th = threading.Thread(target=self.operate)
@@ -129,7 +129,7 @@ class root(QMainWindow):
 
     def operate(self):
         # os.system('decode.exe')
-        subprocess.run('decode.exe')
+        subprocess.run('./script/decode.exe')
 
     def setPet(self, petMode):
         self.gif = QMovie('./pets/' + str(petMode) + '.gif')
@@ -152,7 +152,7 @@ class root(QMainWindow):
         action = cmenu.exec_(self.mapToGlobal(event.pos()))
 
     def screenshot(self):
-        subprocess.run('screenshot.exe')
+        subprocess.run('./script/screenshot.exe')
 
     '''鼠标左键按下时, 宠物将和鼠标位置绑定'''
 
