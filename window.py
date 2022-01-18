@@ -1,13 +1,13 @@
-from pickle import TRUE
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
-import threading
+from script.script import screenshot, decode, baidu, openUrl
 import random
-import subprocess
-import threading
+from functools import partial
+
 import time
+import json
 
 class MySignals(QObject):
     # 定义一种信号，两个参数 类型分别是： QTextBrowser 和 字符串
@@ -39,6 +39,7 @@ class root(QMainWindow):
         self.petNum = random.randint(0, 2)
         self.setUI()
         self.setSignal()
+        self.jsonDataInit()
 
     def setSignal(self):
         gs.print.connect(self.print)
@@ -102,15 +103,30 @@ class root(QMainWindow):
         self.tray_icon.show()
         self.show()
 
+    def jsonDataInit(self):
+        with open("conf.json",'r', encoding='utf-8') as load_f:
+            self.load_dict = json.load(load_f)
+
     def contextMenuEvent(self, event):
-        cmenu = QMenu(self)
-        hideAction = cmenu.addAction(self.petHide)
-        clearAction = cmenu.addAction(self.Clear)
-        shotAction = cmenu.addAction(self.shot)
-        decodeAction = cmenu.addAction(self.urlaction)
-        wenkuAction = cmenu.addAction(self.library)
-        quitAction = cmenu.addAction(self.Quit)
-        action = cmenu.exec_(self.mapToGlobal(event.pos()))
+        cmenu = QMenu(self)      
+        cmenu.addAction(self.petHide)
+        cmenu.addAction(self.Clear)
+        urlList = self.load_dict['web']
+        if len(urlList) > 0:
+            webMeue = QMenu(self)
+            webMeue.setIcon(QIcon('./resourses/web.png'))
+            webMeue.setTitle("网站")
+            myaction = None
+            for i in urlList:
+                myaction = QAction(i['title'], self)
+                myaction.triggered.connect(partial(openUrl, i['url']))
+                webMeue.addAction(myaction)
+            cmenu.addMenu(webMeue)
+        cmenu.addAction(self.shot)
+        cmenu.addAction(self.urlaction)
+        cmenu.addAction(self.library)
+        cmenu.addAction(self.Quit)
+        cmenu.exec_(self.mapToGlobal(event.pos()))
     
     def actionInit(self):
         # 退出功能的定义
@@ -122,15 +138,15 @@ class root(QMainWindow):
         self.Clear_Icon = QIcon('./resourses/clear.png')
         self.Clear.setIcon(self.Clear_Icon)
         # 截图功能的定义
-        self.shot = QAction('截图', self, triggered=self.screenshot)
+        self.shot = QAction('截图', self, triggered=screenshot)
         self.Shot_Icon = QIcon('./resourses/screenshot.png')
         self.shot.setIcon(self.Shot_Icon)
         # Deocde
-        self.urlaction = QAction('解析', self, triggered=self.decode)
+        self.urlaction = QAction('解析', self, triggered=decode)
         self.url_icon = QIcon('./resourses/decode.ico')
         self.urlaction.setIcon(self.url_icon)
         # 百度文库功能
-        self.library = QAction('文库', self, triggered=self.baidu)
+        self.library = QAction('文库', self, triggered=baidu)
         self.lib_icon = QIcon('./resourses/wenku.ico')
         self.library.setIcon(self.lib_icon)
         # 隐藏
@@ -145,22 +161,7 @@ class root(QMainWindow):
     def pShow(self):
         self.setVisible(True)
     
-    def baidu(self):
-        client_th = threading.Thread(target=self.wenku_decode)
-        client_th.setDaemon(True)
-        client_th.start()
-
-    def wenku_decode(self):
-        subprocess.run('./script/wenku.exe')
-
-    def decode(self):
-        client_th = threading.Thread(target=self.operate)
-        client_th.setDaemon(True)
-        client_th.start()
-
-    def operate(self):
-        # os.system('decode.exe')
-        subprocess.run('./script/decode.exe')
+    
 
     def setPet(self, petMode):
         self.gif = QMovie('./pets/' + str(petMode) + '.gif')
@@ -177,8 +178,6 @@ class root(QMainWindow):
         self.setPet(self.petCostom[self.petNum])
 
 
-    def screenshot(self):
-        subprocess.run('./script/screenshot.exe')
 
     '''鼠标左键按下时, 宠物将和鼠标位置绑定'''
 
@@ -227,4 +226,5 @@ class root(QMainWindow):
     def setLabelMessageDisappear(self):
         if not self.isMouseEnter:
             self.labelMessage.setVisible(False)
+
 
