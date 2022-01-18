@@ -13,15 +13,22 @@ target_path_pets = "./dist/pets"
 if os.path.exists(target_path_pets):
     shutil.rmtree(target_path_pets)
 
+source_path_script = './script'
+target_path_script = "./dist/script"
+if os.path.exists(target_path_script):
+    shutil.rmtree(target_path_script)
+
+
 
 shutil.copytree(source_path_resourses, target_path_resourses)
 shutil.copytree(source_path_pets, target_path_pets)
+shutil.copytree(source_path_script, target_path_script)
 
 
 os.system("pyinstaller -F -w -i ./resourses/bitbug_favicon.ico main.py")
 
 print("打包zip文件")
-file_names = [target_path_resourses, target_path_pets, './dist/main.exe']
+file_names = [target_path_resourses, target_path_pets, target_path_script,'./dist/main.exe']
 with zipfile.ZipFile('./dist/dist_win.zip', mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
     for fn in file_names:
             parent_path, name = os.path.split(fn)
