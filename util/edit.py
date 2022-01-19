@@ -9,7 +9,6 @@ def init_icon(url, name):
     if os.path.exists(file_path):
         return 0, file_path
     try:
-        print(url)
         response = requests.get(url, stream=True, timeout=(1, 3))  # stream=True必须写上
         print("request")
     except:
@@ -56,5 +55,3 @@ def delWebSite(name):
                 json.dump(data, f)
             return 0
     return 1
-
-    

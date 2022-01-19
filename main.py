@@ -4,8 +4,18 @@ from PyQt5.QtWidgets import QApplication
 import sys
 import threading
 from util.edit import delWebSite, addWebSite
+import json
 
 flask_app = Flask(__name__)
+
+def retrun_template(code = 0, state='ok', data='', error=''):
+    return jsonify({
+            "code": code,
+            "state": state,
+            "data": data,
+            "error": error
+        })
+
 
 @flask_app.route("/api/say", methods=['POST'])
 def say():
@@ -15,52 +25,41 @@ def say():
         meow_thread = threading.Thread(target=playMeow())
         meow_thread.setDaemon(True)
         meow_thread.start()
-        return jsonify({
-            "code": 0,
-            "state": "ok"
-        })
+        return retrun_template()
     except Exception as e:
-        return jsonify({
-            "code": 1,
-            "state": "bad_request",
-            "error": str(e)
-        })
+        return retrun_template(1, state='bad request', error=str(e))
 
 @flask_app.route("/api/clear", methods=['POST'])
 def clear():
     try:
         gs.clear.emit()
-        return jsonify({
-            "code": 0,
-            "state": "ok"
-        })
+        return retrun_template()
+
     except Exception as e:
-        return jsonify({
-            "code": 1,
-            "state": "bad_request",
-            "error": str(e)
-        })
+        return retrun_template(1, state='bad request', error=str(e))
+
+
+
+@flask_app.route("/api/get_conf", methods=['POST'])
+def get_conf():
+    try:
+        with open('conf.json', 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return retrun_template(0, data=data)
+    except Exception as e:
+        return retrun_template(1, state='bad request', error=str(e))
+
 
 @flask_app.route("/api/web_del", methods=['POST'])
 def website():
     post_str=request.form['title']
     try:
         if delWebSite(post_str) == 0:
-            return jsonify({
-                "code": 0,
-                "state": "ok"
-            })
+            return retrun_template()
         else:
-            return jsonify({
-                "code": 2,
-                "state": "%s not exits" % (post_str)
-            })
+            return retrun_template(2, state='Not Found', error="Can not found %s" % post_str)
     except Exception as e:
-        return jsonify({
-            "code": 1,
-            "state": "bad_request",
-            "error": str(e)
-        })
+        return retrun_template(1, state='bad request', error=str(e))
 
 
 @flask_app.route("/api/web_add", methods=['POST'])
@@ -69,16 +68,9 @@ def website2():
     post_str_url=request.form['url']
     try:
         addWebSite(post_str_title, post_str_url)
-        return jsonify({
-                "code": 0,
-                "state": "ok"
-            })
+        return retrun_template()
     except Exception as e:
-        return jsonify({
-            "code": 1,
-            "state": "bad_request",
-            "error": str(e)
-        })
+        return retrun_template(1, state='bad request', error=str(e))
 
 
 def app_run():

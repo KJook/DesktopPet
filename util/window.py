@@ -1,4 +1,3 @@
-from threading import Thread
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
