@@ -4,7 +4,7 @@ import os
 
 def init_icon(url, name):
     path = './resourses/webicon'
-    m_path = './resourses/webicon/favicon.ico'
+    m_path = './resourses/webicon/star.png'
     file_path = os.path.join(path, name + '.ico')
     if os.path.exists(file_path):
         return 0, file_path

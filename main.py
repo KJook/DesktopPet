@@ -5,8 +5,12 @@ import sys
 import threading
 from util.edit import delWebSite, addWebSite
 import json
+from flask_cors import CORS
+
 
 flask_app = Flask(__name__)
+CORS(flask_app, supports_credentials=True)
+
 
 def retrun_template(code = 0, state='ok', data='', error=''):
     return jsonify({
@@ -40,7 +44,7 @@ def clear():
 
 
 
-@flask_app.route("/api/get_conf", methods=['POST'])
+@flask_app.route("/api/get_conf", methods=['GET'])
 def get_conf():
     try:
         with open('conf.json', 'r', encoding='utf-8') as f:
