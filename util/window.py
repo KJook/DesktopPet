@@ -2,11 +2,11 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTr
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
-from script.script import screenshot, decode, baidu, openUrl
+from script.script import openUrl, openExe
 import random
 from functools import partial
 from util.autorun import Judge_Key, AutoRun
-from util.edit import init_icon
+from util.edit import init_icon, init_exe_icon
 
 import time
 import json
@@ -40,6 +40,7 @@ class root(QMainWindow):
         self.mouse_drag_pos = self.pos()
         self.petNum = random.randint(0, 2)
         self.webIconList = []
+        self.scriptIconList = []
         self.jsonDataInit()
         self.icon_init()
         self.setUI()
@@ -114,7 +115,9 @@ class root(QMainWindow):
         for i in urlList:
             ico = init_icon("https://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
             self.webIconList.append(QIcon(ico[1]))
-
+        scriptList = self.load_dict['script']
+        for i in scriptList:
+            self.scriptIconList.append(QIcon(init_exe_icon(i['url'])))
 
     def jsonDataInit(self):
         with open("conf.json",'r', encoding='utf-8') as load_f:
@@ -125,10 +128,11 @@ class root(QMainWindow):
         cmenu.addAction(self.petHide)
         cmenu.addAction(self.Clear)
         urlList = self.load_dict['web']
+        scriptList = self.load_dict['script']
         if len(urlList) > 0:
             webMeue = QMenu(self)
-            webMeue.setIcon(QIcon('./resourses/web.png'))
             webMeue.setTitle("网站")
+            webMeue.setIcon(QIcon('./resourses/web.png'))
             myaction = None
             for i in range(len(urlList)):
                 myaction = QAction(urlList[i]['title'], self)
@@ -136,13 +140,18 @@ class root(QMainWindow):
                 myaction.triggered.connect(partial(openUrl, urlList[i]['url']))
                 webMeue.addAction(myaction)
             cmenu.addMenu(webMeue)
-        toolMeue = QMenu(self)
-        toolMeue.setTitle("工具")
-        toolMeue.setIcon(QIcon('./resourses/tool.png'))
-        toolMeue.addAction(self.shot)
-        toolMeue.addAction(self.urlaction)
-        toolMeue.addAction(self.library)
-        cmenu.addMenu(toolMeue)
+        
+        if len(scriptList) > 0:
+            toolMeue = QMenu(self)
+            toolMeue.setTitle("工具")
+            toolMeue.setIcon(QIcon('./resourses/tool.png'))
+            myaction = None
+            for i in range(len(scriptList)):
+                myaction = QAction(scriptList[i]['title'], self)
+                myaction.setIcon(self.scriptIconList[i])
+                myaction.triggered.connect(partial(openExe, scriptList[i]['url']))
+                toolMeue.addAction(myaction)
+            cmenu.addMenu(toolMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
     
@@ -156,17 +165,17 @@ class root(QMainWindow):
         self.Clear_Icon = QIcon('./resourses/clear.png')
         self.Clear.setIcon(self.Clear_Icon)
         # 截图功能的定义
-        self.shot = QAction('截图', self, triggered=screenshot)
-        self.Shot_Icon = QIcon('./resourses/screenshot.png')
-        self.shot.setIcon(self.Shot_Icon)
+        #self.shot = QAction('截图', self, triggered=screenshot)
+        #self.Shot_Icon = QIcon('./resourses/screenshot.png')
+        #self.shot.setIcon(self.Shot_Icon)
         # Deocde
-        self.urlaction = QAction('解析', self, triggered=decode)
-        self.url_icon = QIcon('./resourses/decode.ico')
-        self.urlaction.setIcon(self.url_icon)
+        #self.urlaction = QAction('解析', self, triggered=decode)
+        #self.url_icon = QIcon('./resourses/decode.ico')
+        #self.urlaction.setIcon(self.url_icon)
         # 百度文库功能
-        self.library = QAction('文库', self, triggered=baidu)
-        self.lib_icon = QIcon('./resourses/wenku.ico')
-        self.library.setIcon(self.lib_icon)
+        #self.library = QAction('文库', self, triggered=baidu)
+        #self.lib_icon = QIcon('./resourses/wenku.ico')
+        #self.library.setIcon(self.lib_icon)
         # 隐藏
         self.petHide = QAction('隐藏', self, triggered=self.pHide)
         self.petHide_icon = QIcon('./resourses/hide.png')

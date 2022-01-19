@@ -1,26 +1,13 @@
 import threading
 import subprocess
 import webbrowser
+def openExe(path):
+    client_th = threading.Thread(target=subprocess.run, args=(path,))
+    client_th.setDaemon(True)
+    client_th.start()
 
-def screenshot():
-        subprocess.run('./script/screenshot.exe')
 
 def openUrl(url):
-    webbrowser.open(url)
-
-def baidu():
-    client_th = threading.Thread(target=wenku_decode)
+    client_th = threading.Thread(target=webbrowser.open, args=(url,))
     client_th.setDaemon(True)
     client_th.start()
-
-def wenku_decode():
-    subprocess.run('./script/wenku.exe')
-
-def decode():
-    client_th = threading.Thread(target=operate)
-    client_th.setDaemon(True)
-    client_th.start()
-
-def operate():
-    # os.system('decode.exe')
-    subprocess.run('./script/decode.exe')
