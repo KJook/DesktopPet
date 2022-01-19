@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # author：mgboy time:2020/8/2
-
 import win32api
 import win32con, winreg, os, sys
 from PyQt5.QtWidgets import QMessageBox
