@@ -1,3 +1,4 @@
+from threading import Thread
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
@@ -6,6 +7,7 @@ from script.script import screenshot, decode, baidu, openUrl
 import random
 from functools import partial
 from util.autorun import Judge_Key, AutoRun
+from util.edit import init_icon
 
 import time
 import json
@@ -38,9 +40,11 @@ class root(QMainWindow):
         self.is_follow_mouse = True
         self.mouse_drag_pos = self.pos()
         self.petNum = random.randint(0, 2)
+        self.webIconList = []
+        self.jsonDataInit()
+        self.icon_init()
         self.setUI()
         self.setSignal()
-        self.jsonDataInit()
 
     def setSignal(self):
         gs.print.connect(self.print)
@@ -57,6 +61,7 @@ class root(QMainWindow):
         self.labelMessage.setVisible(False)
         self.isMouseEnter = False
         self.labelMessage.setAlignment(Qt.AlignCenter)
+
 
 
     def setUI(self):
@@ -105,6 +110,13 @@ class root(QMainWindow):
         self.tray_icon.show()
         self.show()
 
+    def icon_init(self):
+        urlList = self.load_dict['web']
+        for i in urlList:
+            ico = init_icon("https://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
+            self.webIconList.append(QIcon(ico[1]))
+
+
     def jsonDataInit(self):
         with open("conf.json",'r', encoding='utf-8') as load_f:
             self.load_dict = json.load(load_f)
@@ -119,14 +131,19 @@ class root(QMainWindow):
             webMeue.setIcon(QIcon('./resourses/web.png'))
             webMeue.setTitle("网站")
             myaction = None
-            for i in urlList:
-                myaction = QAction(i['title'], self)
-                myaction.triggered.connect(partial(openUrl, i['url']))
+            for i in range(len(urlList)):
+                myaction = QAction(urlList[i]['title'], self)
+                myaction.setIcon(self.webIconList[i])
+                myaction.triggered.connect(partial(openUrl, urlList[i]['url']))
                 webMeue.addAction(myaction)
             cmenu.addMenu(webMeue)
-        cmenu.addAction(self.shot)
-        cmenu.addAction(self.urlaction)
-        cmenu.addAction(self.library)
+        toolMeue = QMenu(self)
+        toolMeue.setTitle("工具")
+        toolMeue.setIcon(QIcon('./resourses/tool.png'))
+        toolMeue.addAction(self.shot)
+        toolMeue.addAction(self.urlaction)
+        toolMeue.addAction(self.library)
+        cmenu.addMenu(toolMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
     
