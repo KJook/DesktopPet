@@ -118,6 +118,28 @@ class root(QMainWindow):
         scriptList = self.load_dict['script']
         for i in scriptList:
             self.scriptIconList.append(QIcon(init_exe_icon(i['url'])))
+        if len(urlList) > 0:
+            self.webMeue = QMenu(self)
+            self.webMeue.setTitle("网站")
+            self.webMeue.setIcon(QIcon('./resourses/web.png'))
+            myaction = None
+            for i in range(len(urlList)):
+                myaction = QAction(urlList[i]['title'], self)
+                myaction.setIcon(self.webIconList[i])
+                myaction.triggered.connect(partial(openUrl, urlList[i]['url']))
+                self.webMeue.addAction(myaction)
+        
+        if len(scriptList) > 0:
+            self.toolMeue = QMenu(self)
+            self.toolMeue.setTitle("工具")
+            self.toolMeue.setIcon(QIcon('./resourses/tool.png'))
+            myaction = None
+            for i in range(len(scriptList)):
+                myaction = QAction(scriptList[i]['title'], self)
+                myaction.setIcon(self.scriptIconList[i])
+                myaction.triggered.connect(partial(openExe, scriptList[i]['url']))
+                self.toolMeue.addAction(myaction)
+        
 
     def jsonDataInit(self):
         with open("conf.json",'r', encoding='utf-8') as load_f:
@@ -127,31 +149,8 @@ class root(QMainWindow):
         cmenu = QMenu(self)      
         cmenu.addAction(self.petHide)
         cmenu.addAction(self.Clear)
-        urlList = self.load_dict['web']
-        scriptList = self.load_dict['script']
-        if len(urlList) > 0:
-            webMeue = QMenu(self)
-            webMeue.setTitle("网站")
-            webMeue.setIcon(QIcon('./resourses/web.png'))
-            myaction = None
-            for i in range(len(urlList)):
-                myaction = QAction(urlList[i]['title'], self)
-                myaction.setIcon(self.webIconList[i])
-                myaction.triggered.connect(partial(openUrl, urlList[i]['url']))
-                webMeue.addAction(myaction)
-            cmenu.addMenu(webMeue)
-        
-        if len(scriptList) > 0:
-            toolMeue = QMenu(self)
-            toolMeue.setTitle("工具")
-            toolMeue.setIcon(QIcon('./resourses/tool.png'))
-            myaction = None
-            for i in range(len(scriptList)):
-                myaction = QAction(scriptList[i]['title'], self)
-                myaction.setIcon(self.scriptIconList[i])
-                myaction.triggered.connect(partial(openExe, scriptList[i]['url']))
-                toolMeue.addAction(myaction)
-            cmenu.addMenu(toolMeue)
+        cmenu.addMenu(self.webMeue)
+        cmenu.addMenu(self.toolMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
     

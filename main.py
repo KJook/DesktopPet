@@ -6,7 +6,7 @@ import threading
 from util.edit import delWebSite, addWebSite
 import json
 from flask_cors import CORS
-
+import os
 
 flask_app = Flask(__name__)
 CORS(flask_app, supports_credentials=True)
@@ -57,8 +57,11 @@ def get_conf():
 @flask_app.route("/api/web_del", methods=['POST'])
 def website():
     post_str=request.form['title']
+    attr=request.form['attr']
+    if not attr == "script":
+        attr = "web"
     try:
-        if delWebSite(post_str) == 0:
+        if delWebSite(post_str, attr) == 0:
             return retrun_template()
         else:
             return retrun_template(2, state='Not Found', error="Can not found %s" % post_str)
@@ -70,9 +73,14 @@ def website():
 def website2():
     post_str_title=request.form['title']
     post_str_url=request.form['url']
+    attr=request.form['attr']
+    if attr == 'script':
+        if not os.path.exists(post_str_url):
+            return retrun_template(1, state='bad request', error="%s is not a application" % post_str_url)
+    else:
+        attr = "web"
     try:
-        addWebSite(post_str_title, post_str_url)
-        return retrun_template()
+        return retrun_template(addWebSite(post_str_title, post_str_url, attr))
     except Exception as e:
         return retrun_template(1, state='bad request', error=str(e))
 

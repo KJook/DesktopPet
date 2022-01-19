@@ -66,27 +66,28 @@ def init_icon(url, name):
 
 
 
-def addWebSite(title, url):
+def addWebSite(title, url, attr):
     if title == "" or url == "":
-        return
+        return 3
     with open('conf.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
 
-    webSites = data['web']
+    webSites = data[attr]
     for i in webSites:
         if i['title'] == title:
-            return
+            return 1
     webSites.append({
         "title": title,
         "url": url
     })
     with open('conf.json', 'w', encoding='utf-8') as f:
         json.dump(data, f)
+    return 0
 
-def delWebSite(name):
+def delWebSite(name, attr):
     with open('conf.json', 'r', encoding='utf-8') as f:
         data = json.load(f)
-    webSites = data['web']
+        webSites = data[attr]
     for i in webSites:
         if i['title'] == name:
             webSites.remove(i)
