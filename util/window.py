@@ -5,6 +5,7 @@ from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
 from script.script import screenshot, decode, baidu, openUrl
 import random
 from functools import partial
+from util.autorun import Judge_Key, AutoRun
 
 import time
 import json
@@ -96,6 +97,7 @@ class root(QMainWindow):
         self.tray_icon_menu = QMenu(self)
         self.tray_icon_menu.addAction(self.petShow)
         self.tray_icon_menu.addAction(self.Quit)
+        self.tray_icon_menu.addAction(self.autoRun)
         self.tray_icon = QSystemTrayIcon(self)
         self.trayIcon = QIcon('./resourses/ico.png')
         self.tray_icon.setIcon(self.trayIcon)
@@ -157,12 +159,18 @@ class root(QMainWindow):
         self.petShow = QAction('显示', self, triggered=self.pShow)
         self.petShow_icon = QIcon('./resourses/show.png')
         self.petShow.setIcon(self.petShow_icon)
+        
+        # 开机自启
+        self.autoRun = QAction('开机自启', self)
+        self.autoRun.setCheckable(True)
+        judge = Judge_Key(self, 'kj.DesktopPet') == 0
+        self.autoRun.setChecked(judge)
+        self.autoRun.triggered.connect(partial(AutoRun, self))
 
     def pShow(self):
         self.setVisible(True)
     
     
-
     def setPet(self, petMode):
         self.gif = QMovie('./pets/' + str(petMode) + '.gif')
         self.gif.setScaledSize(self.label.size())
