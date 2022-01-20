@@ -1,1 +1,1 @@
-clear
+flask_cors

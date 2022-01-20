@@ -48,8 +48,8 @@ def init_icon(url, name):
     if os.path.exists(file_path):
         return 0, file_path
     try:
-        response = requests.get(url, stream=True, timeout=(1, 3))  # stream=True必须写上
-        print("request")
+        response = requests.get(url, stream=True, timeout=(5, 10))  # stream=True必须写上
+        # print("request")
     except:
         return -1, m_path
     chunk_size = 1024  # 每次下载的数据大小
