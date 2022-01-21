@@ -1,4 +1,3 @@
-from threading import Thread
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
@@ -10,9 +9,8 @@ from util.autorun import Judge_Key, AutoRun
 from util.edit import init_icon, init_exe_icon
 import time
 import json
-import os
 
-from util.pathLoader import CONF_PATH, CURRENT_PATH
+from util.pathLoader import CONF_PATH
 
 class MySignals(QObject):
     # 定义一种信号，两个参数 类型分别是： QTextBrowser 和 字符串
@@ -169,8 +167,7 @@ class root(QMainWindow):
     def jsonDataInit(self):
         with open(CONF_PATH,'r', encoding='utf-8') as load_f:
             self.load_dict = json.load(load_f)
-        if os.getcwd() == "C:\Windows\System32" or os.getcwd == "C:\\WINDOWS\\system32":
-            os.chdir(self.load_dict['installPath'])
+        
 
 
     def contextMenuEvent(self, event):

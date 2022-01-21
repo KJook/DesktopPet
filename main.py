@@ -1,5 +1,5 @@
-from sqlite3 import Cursor
 from flask import Flask, jsonify, request
+from util.pathLoader import CONF_PATH, init_conf_path
 from util.window import root, gs, playMeow
 from PyQt5.QtWidgets import QApplication
 import sys
@@ -7,7 +7,6 @@ import threading
 import json
 from flask_cors import CORS
 import os
-from util.pathLoader import CONF_PATH
 from util.edit import delWebSite, addWebSite
 flask_app = Flask(__name__)
 CORS(flask_app, supports_credentials=True)
@@ -87,6 +86,7 @@ def app_run():
     flask_app.run(host='0.0.0.0', port=5000, debug=False)
 
 if __name__ == "__main__":
+    init_conf_path()
     app = QApplication(sys.argv)
     graph = root()
     app_thread = threading.Thread(target=app_run)
