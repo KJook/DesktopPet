@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTr
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
-from script.script import openUrl, openExe
+from script.script import openFolder, openUrl, openExe
 import random
 from functools import partial
 from util.autorun import Judge_Key, AutoRun
@@ -45,6 +45,7 @@ class root(QMainWindow):
         self.jsonDataInit()
         self.existWeb = False
         self.existTool = False
+        self.existFolder = False
         self.icon_init()
         self.setUI()
         self.setSignal()
@@ -133,18 +134,21 @@ class root(QMainWindow):
 
     def icon_init(self):
         urlList = self.load_dict['web']
+        scriptList = self.load_dict['script']
+        folderList = self.load_dict['folder']
+
         for i in urlList:
             ico = init_icon("http://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
             self.webIconList.append(QIcon(ico[1]))
-        scriptList = self.load_dict['script']
+        
         for i in scriptList:
             self.scriptIconList.append(QIcon(init_exe_icon(i['url'])))
+        
         if len(urlList) > 0:
             self.existWeb = True
             self.webMeue = QMenu(self)
             self.webMeue.setTitle("网站")
             self.webMeue.setIcon(QIcon('./resourses/web.png'))
-            myaction = None
             for i in range(len(urlList)):
                 myaction = QAction(urlList[i]['title'], self)
                 myaction.setIcon(self.webIconList[i])
@@ -156,12 +160,22 @@ class root(QMainWindow):
             self.toolMeue = QMenu(self)
             self.toolMeue.setTitle("工具")
             self.toolMeue.setIcon(QIcon('./resourses/tool.png'))
-            myaction = None
             for i in range(len(scriptList)):
                 myaction = QAction(scriptList[i]['title'], self)
                 myaction.setIcon(self.scriptIconList[i])
                 myaction.triggered.connect(partial(openExe, scriptList[i]['url']))
                 self.toolMeue.addAction(myaction)
+            
+        if len(folderList) > 0:
+            self.existFolder = True
+            self.folderMeue = QMenu(self)
+            self.folderMeue.setTitle("访问")
+            self.folderMeue.setIcon(QIcon('./resourses/folder.png'))
+            for i in range(len(folderList)):
+                myaction = QAction(folderList[i]['title'], self)
+                myaction.setIcon(QIcon('./resourses/folder.png'))
+                myaction.triggered.connect(partial(openFolder, folderList[i]['url']))
+                self.folderMeue.addAction(myaction)
         
 
     def jsonDataInit(self):
@@ -178,6 +192,8 @@ class root(QMainWindow):
             cmenu.addMenu(self.webMeue)
         if self.existTool:
             cmenu.addMenu(self.toolMeue)
+        if self.existFolder:
+            cmenu.addMenu(self.folderMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
     

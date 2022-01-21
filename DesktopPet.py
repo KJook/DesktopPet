@@ -55,7 +55,7 @@ def get_conf():
 def website():
     post_str=request.form['title']
     attr=request.form['attr']
-    if not attr == "script":
+    if not (attr == "script" or attr == "folder"):
         attr = "web"
     try:
         if delWebSite(post_str, attr, gs) == 0:
@@ -71,7 +71,7 @@ def website2():
     post_str_title=request.form['title']
     post_str_url=request.form['url']
     attr=request.form['attr']
-    if attr == 'script':
+    if attr == "script" or attr == "folder":
         if not os.path.exists(post_str_url):
             return retrun_template(1, state='bad request', error="%s is not a application" % post_str_url)
     else:

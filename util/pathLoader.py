@@ -15,6 +15,9 @@ def new_config_json():
     ],
     "script": [
     ],
+    "folder": [
+
+    ],
     "installPath": os.getcwd()
     }
 
