@@ -1,3 +1,4 @@
+from threading import Thread
 from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
@@ -7,16 +8,18 @@ import random
 from functools import partial
 from util.autorun import Judge_Key, AutoRun
 from util.edit import init_icon, init_exe_icon
-
 import time
 import json
+import os
+
+from util.pathLoader import CONF_PATH, CURRENT_PATH
 
 class MySignals(QObject):
     # 定义一种信号，两个参数 类型分别是： QTextBrowser 和 字符串
     # 调用 emit方法 发信号时，传入参数 必须是这里指定的 参数类型
     print = pyqtSignal(str)
     clear = pyqtSignal()
-
+    refresh_conf = pyqtSignal()
 
 gs = MySignals()
 
@@ -42,13 +45,18 @@ class root(QMainWindow):
         self.webIconList = []
         self.scriptIconList = []
         self.jsonDataInit()
+        self.existWeb = False
+        self.existTool = False
         self.icon_init()
         self.setUI()
         self.setSignal()
 
+    
+
     def setSignal(self):
         gs.print.connect(self.print)
         gs.clear.connect(self.clear)
+        gs.refresh_conf.connect(self.refreshConf)
 
     def print(self, text):
         self.labelMessage.append(str(text))
@@ -110,15 +118,31 @@ class root(QMainWindow):
         self.tray_icon.show()
         self.show()
 
+    # 重新加载action
+    def refreshConf(self):
+        self.jsonDataInit()
+        self.webIconList = []
+        self.scriptIconList = []
+        
+        self.icon_init()
+
+    # def icon_init(self):
+    #     self.init_icon_flag_web = False
+    #     self.init_icon_flag_tool = False
+    #     t = Thread(target=self.icon_init2)
+    #     t.setDaemon(True)
+    #     t.start()
+
     def icon_init(self):
         urlList = self.load_dict['web']
         for i in urlList:
-            ico = init_icon("https://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
+            ico = init_icon("http://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
             self.webIconList.append(QIcon(ico[1]))
         scriptList = self.load_dict['script']
         for i in scriptList:
             self.scriptIconList.append(QIcon(init_exe_icon(i['url'])))
         if len(urlList) > 0:
+            self.existWeb = True
             self.webMeue = QMenu(self)
             self.webMeue.setTitle("网站")
             self.webMeue.setIcon(QIcon('./resourses/web.png'))
@@ -130,6 +154,7 @@ class root(QMainWindow):
                 self.webMeue.addAction(myaction)
         
         if len(scriptList) > 0:
+            self.existTool = True
             self.toolMeue = QMenu(self)
             self.toolMeue.setTitle("工具")
             self.toolMeue.setIcon(QIcon('./resourses/tool.png'))
@@ -142,15 +167,20 @@ class root(QMainWindow):
         
 
     def jsonDataInit(self):
-        with open("conf.json",'r', encoding='utf-8') as load_f:
+        with open(CONF_PATH,'r', encoding='utf-8') as load_f:
             self.load_dict = json.load(load_f)
+        if os.getcwd() == "C:\Windows\System32" or os.getcwd == "C:\\WINDOWS\\system32":
+            os.chdir(self.load_dict['installPath'])
+
 
     def contextMenuEvent(self, event):
         cmenu = QMenu(self)      
         cmenu.addAction(self.petHide)
         cmenu.addAction(self.Clear)
-        cmenu.addMenu(self.webMeue)
-        cmenu.addMenu(self.toolMeue)
+        if self.existWeb:
+            cmenu.addMenu(self.webMeue)
+        if self.existTool:
+            cmenu.addMenu(self.toolMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
     

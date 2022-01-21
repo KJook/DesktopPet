@@ -1,13 +1,14 @@
+from sqlite3 import Cursor
 from flask import Flask, jsonify, request
 from util.window import root, gs, playMeow
 from PyQt5.QtWidgets import QApplication
 import sys
 import threading
-from util.edit import delWebSite, addWebSite
 import json
 from flask_cors import CORS
 import os
-
+from util.pathLoader import CONF_PATH
+from util.edit import delWebSite, addWebSite
 flask_app = Flask(__name__)
 CORS(flask_app, supports_credentials=True)
 
@@ -19,7 +20,6 @@ def retrun_template(code = 0, state='ok', data='', error=''):
             "data": data,
             "error": error
         })
-
 
 @flask_app.route("/api/say", methods=['POST'])
 def say():
@@ -42,12 +42,10 @@ def clear():
     except Exception as e:
         return retrun_template(1, state='bad request', error=str(e))
 
-
-
 @flask_app.route("/api/get_conf", methods=['GET'])
 def get_conf():
     try:
-        with open('conf.json', 'r', encoding='utf-8') as f:
+        with open(CONF_PATH, 'r', encoding='utf-8') as f:
             data = json.load(f)
             return retrun_template(0, data=data)
     except Exception as e:
@@ -61,7 +59,7 @@ def website():
     if not attr == "script":
         attr = "web"
     try:
-        if delWebSite(post_str, attr) == 0:
+        if delWebSite(post_str, attr, gs) == 0:
             return retrun_template()
         else:
             return retrun_template(2, state='Not Found', error="Can not found %s" % post_str)
@@ -80,7 +78,7 @@ def website2():
     else:
         attr = "web"
     try:
-        return retrun_template(addWebSite(post_str_title, post_str_url, attr))
+        return retrun_template(addWebSite(post_str_title, post_str_url, attr, gs))
     except Exception as e:
         return retrun_template(1, state='bad request', error=str(e))
 

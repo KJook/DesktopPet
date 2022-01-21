@@ -55,16 +55,16 @@ if os.path.exists(target_path_script):
     shutil.rmtree(target_path_script)
 
 
-
 shutil.copytree(source_path_resourses, target_path_resourses)
 shutil.copytree(source_path_pets, target_path_pets)
 shutil.copytree(source_path_script, target_path_script)
-
+# shutil.copy('./conf.json', './dist/conf.json')
+os.remove('./dist/script/script.py')
 # 虚拟环境下pyinstaller
-os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -w -i ./resourses/bitbug_favicon.ico main.py")
+os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -i ./resourses/bitbug_favicon.ico main.py")
 
 print("打包zip文件")
 
-zip_compress('./dist', './dist/dist_win.zip')
+zip_compress('./dist', './DesktopPet_win_amd64.zip')
 
 print("打包结束")

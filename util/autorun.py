@@ -24,6 +24,7 @@ def Judge_Key(self, key_name=None,
 	:return:feedback是（0/1/2/3：存在/不存在/权限不足/报错）
 	"""
     abspath=os.path.abspath(sys.argv[0])
+
     reg_flags = win32con.WRITE_OWNER | win32con.KEY_WOW64_64KEY | win32con.KEY_ALL_ACCESS
     try:
         key = winreg.OpenKey(reg_root, reg_path, 0, reg_flags)
@@ -32,6 +33,8 @@ def Judge_Key(self, key_name=None,
         feedback = 0
         if location != abspath:
             feedback = 1
+            win32api.RegDeleteValue(key, key_name)  # 删除值
+            win32api.RegCloseKey(key)
             # print('键存在，但程序位置发生改变')
     except FileNotFoundError as e:
         # print("键不存在", e)
@@ -66,6 +69,7 @@ def AutoRun(self):
                 return
                 # print("已经开启了，无需再开启")
             elif judge_key == 1:
+                
                 win32api.RegSetValueEx(key, key_name, 0, win32con.REG_SZ, abspath)
                 win32api.RegCloseKey(key)
                 # print('开机自启动添加成功！')

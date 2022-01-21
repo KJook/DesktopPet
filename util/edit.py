@@ -1,13 +1,14 @@
+import imp
 import json
-import requests
 import os
-
 import win32api
 import win32ui
 import win32gui
 import win32con
 from PIL import Image
 import re
+import requests
+from util.pathLoader import CONF_PATH
 
 def init_exe_icon(path):
     savePath = "./resourses/exeicon/"
@@ -40,7 +41,6 @@ def init_exe_icon(path):
     img.save(savePath)
     return savePath
 
-init_exe_icon("./script/decode.exe") #This is just a example file path.
 def init_icon(url, name):
     path = './resourses/webicon'
     m_path = './resourses/webicon/star.png'
@@ -48,8 +48,7 @@ def init_icon(url, name):
     if os.path.exists(file_path):
         return 0, file_path
     try:
-        response = requests.get(url, stream=True, timeout=(5, 10))  # stream=True必须写上
-        # print("request")
+        response = requests.get(url, stream=True, timeout=(1, 10))  # stream=True必须写上
     except:
         return -1, m_path
     chunk_size = 1024  # 每次下载的数据大小
@@ -66,12 +65,11 @@ def init_icon(url, name):
 
 
 
-def addWebSite(title, url, attr):
+def addWebSite(title, url, attr, gs):
     if title == "" or url == "":
         return 3
-    with open('conf.json', 'r', encoding='utf-8') as f:
+    with open(CONF_PATH, 'r', encoding='utf-8') as f:
         data = json.load(f)
-
     webSites = data[attr]
     for i in webSites:
         if i['title'] == title:
@@ -80,18 +78,20 @@ def addWebSite(title, url, attr):
         "title": title,
         "url": url
     })
-    with open('conf.json', 'w', encoding='utf-8') as f:
+    with open(CONF_PATH, 'w', encoding='utf-8') as f:
         json.dump(data, f)
+    gs.refresh_conf.emit()
     return 0
 
-def delWebSite(name, attr):
-    with open('conf.json', 'r', encoding='utf-8') as f:
+def delWebSite(name, attr, gs):
+    with open(CONF_PATH, 'r', encoding='utf-8') as f:
         data = json.load(f)
         webSites = data[attr]
     for i in webSites:
         if i['title'] == name:
             webSites.remove(i)
-            with open('conf.json', 'w', encoding='utf-8') as f:
+            with open(CONF_PATH, 'w', encoding='utf-8') as f:
                 json.dump(data, f)
+            gs.refresh_conf.emit()
             return 0
     return 1
