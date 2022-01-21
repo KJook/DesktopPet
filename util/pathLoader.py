@@ -58,3 +58,7 @@ def init_conf_path():
         else:
             # print("NOT enter")
             write_install_path(os.getcwd())
+    if not os.path.exists('./resourses/exeicon'):
+        os.makedirs('./resourses/exeicon')
+    if not os.path.exists('./resourses/webicon'):
+        os.makedirs('./resourses/webicon')

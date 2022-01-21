@@ -1,4 +1,6 @@
-import imp
+import requests
+from util.pathLoader import CONF_PATH
+import re
 import json
 import os
 import win32api
@@ -6,40 +8,34 @@ import win32ui
 import win32gui
 import win32con
 from PIL import Image
-import re
-import requests
-from util.pathLoader import CONF_PATH
+
 
 def init_exe_icon(path):
     savePath = "./resourses/exeicon/"
-    name = re.findall(r'[^\\/:*?"<>|\r\n]+$', path)[0].split('.')[0]+ '.png'
+    name = re.findall(r'[^\\/:*?"<>|\r\n]+$', path)[0].split('.')[0] + '.png'
     savePath = savePath + name
     if os.path.exists(savePath):
         return savePath
-    # path = path.replace("\\", "/")
-    icoX = win32api.GetSystemMetrics(win32con.SM_CXICON)
 
+    icoX = win32api.GetSystemMetrics(win32con.SM_CXICON)
     large, small = win32gui.ExtractIconEx(path, 0)
     win32gui.DestroyIcon(small[0])
-
     hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
     hbmp = win32ui.CreateBitmap()
     hbmp.CreateCompatibleBitmap(hdc, icoX, icoX)
     hdc = hdc.CreateCompatibleDC()
-
     hdc.SelectObject(hbmp)
-    hdc.DrawIcon((0,0), large[0])
-
-    # hbmp.SaveBitmapFile(hdc, savePath + "None.bmp")
-    # bmpinfo = dataBitMap.GetInfo()
+    hdc.DrawIcon((0, 0), large[0])
     bmpstr = hbmp.GetBitmapBits(True)
     img = Image.frombuffer(
         'RGBA',
-        (32,32),
+        (32, 32),
         bmpstr, 'raw', 'BGRA', 0, 1
     )
     img.save(savePath)
+
     return savePath
+
 
 def init_icon(url, name):
     path = './resourses/webicon'
@@ -48,7 +44,8 @@ def init_icon(url, name):
     if os.path.exists(file_path):
         return 0, file_path
     try:
-        response = requests.get(url, stream=True, timeout=(1, 10))  # stream=True必须写上
+        response = requests.get(
+            url, stream=True, timeout=(1, 10))  # stream=True必须写上
     except:
         return -1, m_path
     chunk_size = 1024  # 每次下载的数据大小
@@ -62,7 +59,6 @@ def init_icon(url, name):
             return 2, m_path
     except Exception as e:
         return 1, m_path
-
 
 
 def addWebSite(title, url, attr, gs):
@@ -82,6 +78,7 @@ def addWebSite(title, url, attr, gs):
         json.dump(data, f)
     gs.refresh_conf.emit()
     return 0
+
 
 def delWebSite(name, attr, gs):
     with open(CONF_PATH, 'r', encoding='utf-8') as f:

@@ -12,6 +12,7 @@ import json
 
 from util.pathLoader import CONF_PATH
 
+
 class MySignals(QObject):
     # 定义一种信号，两个参数 类型分别是： QTextBrowser 和 字符串
     # 调用 emit方法 发信号时，传入参数 必须是这里指定的 参数类型
@@ -19,16 +20,19 @@ class MySignals(QObject):
     clear = pyqtSignal()
     refresh_conf = pyqtSignal()
 
+
 gs = MySignals()
 
+
 def playMeow():
-    file = QUrl.fromLocalFile('./resourses/meow.mp3') # 音频文件路径
+    file = QUrl.fromLocalFile('./resourses/meow.mp3')  # 音频文件路径
     content = QtMultimedia.QMediaContent(file)
     player = QtMultimedia.QMediaPlayer()
     player.setMedia(content)
     player.setVolume(50.0)
     player.play()
-    time.sleep(1) #设置延时等待音频播放结束
+    time.sleep(1)  # 设置延时等待音频播放结束
+
 
 class root(QMainWindow):
     def __init__(self):
@@ -50,8 +54,6 @@ class root(QMainWindow):
         self.setUI()
         self.setSignal()
 
-    
-
     def setSignal(self):
         gs.print.connect(self.print)
         gs.clear.connect(self.clear)
@@ -68,8 +70,6 @@ class root(QMainWindow):
         self.labelMessage.setVisible(False)
         self.isMouseEnter = False
         self.labelMessage.setAlignment(Qt.AlignCenter)
-
-
 
     def setUI(self):
         self.setWindowFlags(Qt.FramelessWindowHint |
@@ -122,7 +122,7 @@ class root(QMainWindow):
         self.jsonDataInit()
         self.webIconList = []
         self.scriptIconList = []
-        
+
         self.icon_init()
 
     # def icon_init(self):
@@ -138,12 +138,12 @@ class root(QMainWindow):
         folderList = self.load_dict['folder']
 
         for i in urlList:
-            ico = init_icon("http://" + i['url'].split('/')[2] + '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
+            ico = init_icon("http://" + i['url'].split('/')[2] +
+                            '/favicon.ico', i['url'].split('/')[2].split('.')[-2])
             self.webIconList.append(QIcon(ico[1]))
-        
         for i in scriptList:
             self.scriptIconList.append(QIcon(init_exe_icon(i['url'])))
-        
+
         if len(urlList) > 0:
             self.existWeb = True
             self.webMeue = QMenu(self)
@@ -154,7 +154,7 @@ class root(QMainWindow):
                 myaction.setIcon(self.webIconList[i])
                 myaction.triggered.connect(partial(openUrl, urlList[i]['url']))
                 self.webMeue.addAction(myaction)
-        
+
         if len(scriptList) > 0:
             self.existTool = True
             self.toolMeue = QMenu(self)
@@ -163,9 +163,10 @@ class root(QMainWindow):
             for i in range(len(scriptList)):
                 myaction = QAction(scriptList[i]['title'], self)
                 myaction.setIcon(self.scriptIconList[i])
-                myaction.triggered.connect(partial(openExe, scriptList[i]['url']))
+                myaction.triggered.connect(
+                    partial(openExe, scriptList[i]['url']))
                 self.toolMeue.addAction(myaction)
-            
+
         if len(folderList) > 0:
             self.existFolder = True
             self.folderMeue = QMenu(self)
@@ -174,18 +175,16 @@ class root(QMainWindow):
             for i in range(len(folderList)):
                 myaction = QAction(folderList[i]['title'], self)
                 myaction.setIcon(QIcon('./resourses/folder.png'))
-                myaction.triggered.connect(partial(openFolder, folderList[i]['url']))
+                myaction.triggered.connect(
+                    partial(openFolder, folderList[i]['url']))
                 self.folderMeue.addAction(myaction)
-        
 
     def jsonDataInit(self):
-        with open(CONF_PATH,'r', encoding='utf-8') as load_f:
+        with open(CONF_PATH, 'r', encoding='utf-8') as load_f:
             self.load_dict = json.load(load_f)
-        
-
 
     def contextMenuEvent(self, event):
-        cmenu = QMenu(self)      
+        cmenu = QMenu(self)
         cmenu.addAction(self.petHide)
         cmenu.addAction(self.Clear)
         if self.existWeb:
@@ -196,7 +195,7 @@ class root(QMainWindow):
             cmenu.addMenu(self.folderMeue)
         cmenu.addAction(self.Quit)
         cmenu.exec_(self.mapToGlobal(event.pos()))
-    
+
     def actionInit(self):
         # 退出功能的定义
         self.Quit = QAction('退出', self, triggered=qApp.quit)
@@ -209,15 +208,15 @@ class root(QMainWindow):
         # 截图功能的定义
         #self.shot = QAction('截图', self, triggered=screenshot)
         #self.Shot_Icon = QIcon('./resourses/screenshot.png')
-        #self.shot.setIcon(self.Shot_Icon)
+        # self.shot.setIcon(self.Shot_Icon)
         # Deocde
         #self.urlaction = QAction('解析', self, triggered=decode)
         #self.url_icon = QIcon('./resourses/decode.ico')
-        #self.urlaction.setIcon(self.url_icon)
+        # self.urlaction.setIcon(self.url_icon)
         # 百度文库功能
         #self.library = QAction('文库', self, triggered=baidu)
         #self.lib_icon = QIcon('./resourses/wenku.ico')
-        #self.library.setIcon(self.lib_icon)
+        # self.library.setIcon(self.lib_icon)
         # 隐藏
         self.petHide = QAction('隐藏', self, triggered=self.pHide)
         self.petHide_icon = QIcon('./resourses/hide.png')
@@ -226,7 +225,7 @@ class root(QMainWindow):
         self.petShow = QAction('显示', self, triggered=self.pShow)
         self.petShow_icon = QIcon('./resourses/show.png')
         self.petShow.setIcon(self.petShow_icon)
-        
+
         # 开机自启
         self.autoRun = QAction('开机自启', self)
         self.autoRun.setCheckable(True)
@@ -236,8 +235,7 @@ class root(QMainWindow):
 
     def pShow(self):
         self.setVisible(True)
-    
-    
+
     def setPet(self, petMode):
         self.gif = QMovie('./pets/' + str(petMode) + '.gif')
         self.gif.setScaledSize(self.label.size())
@@ -247,12 +245,10 @@ class root(QMainWindow):
 
     def pHide(self):
         self.setVisible(False)
-    
+
     def randomPet(self):
         self.petNum = random.randint(0, len(self.petCostom) - 1)
         self.setPet(self.petCostom[self.petNum])
-
-
 
     '''鼠标左键按下时, 宠物将和鼠标位置绑定'''
 
@@ -292,7 +288,7 @@ class root(QMainWindow):
             self.isMouseEnter = False
             self.disappearAfterTime(1200)
         self.setPet(self.petCostom[self.petNum])
-    
+
     def disappearAfterTime(self, time):
         self.timer2 = QTimer()
         self.timer2.timeout.connect(self.setLabelMessageDisappear)
@@ -301,5 +297,3 @@ class root(QMainWindow):
     def setLabelMessageDisappear(self):
         if not self.isMouseEnter:
             self.labelMessage.setVisible(False)
-
-
