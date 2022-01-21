@@ -61,10 +61,10 @@ shutil.copytree(source_path_script, target_path_script)
 # shutil.copy('./conf.json', './dist/conf.json')
 os.remove('./dist/script/script.py')
 # 虚拟环境下pyinstaller
-os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -w -i ./resourses/bitbug_favicon.ico main.py")
+os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -w -i ./resourses/bitbug_favicon.ico DesktopPet.py")
 
 print("打包zip文件")
 
-zip_compress('./dist', './DesktopPet_win_amd64.zip')
+zip_compress('./dist', './build/DesktopPet_win_amd64.zip')
 
 print("打包结束")

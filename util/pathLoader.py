@@ -44,14 +44,14 @@ def get_install_path():
 
     
 def init_conf_path():
-    print(os.getcwd())
+    # print(os.getcwd())
     if not os.path.exists(CONF_PATH):
-        print("Not exist")
+        # print("Not exist")
         new_config_json()
     else:
         if os.getcwd() == "C:\WINDOWS\system32" or os.getcwd == "C:\\WINDOWS\\system32":
-            print("enter")
+            # print("enter")
             os.chdir(get_install_path())
         else:
-            print("NOT enter")
+            # print("NOT enter")
             write_install_path(os.getcwd())
