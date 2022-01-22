@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTr
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
-from script.script import openFolder, openUrl, openExe
 import random
 from functools import partial
+from util.script import openFolder, openUrl, openExe
 from util.autorun import Judge_Key, AutoRun
 from util.edit import init_icon, init_exe_icon
 import time

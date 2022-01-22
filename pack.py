@@ -49,19 +49,13 @@ target_path_pets = "./dist/pets"
 if os.path.exists(target_path_pets):
     shutil.rmtree(target_path_pets)
 
-source_path_script = './script'
-target_path_script = "./dist/script"
-if os.path.exists(target_path_script):
-    shutil.rmtree(target_path_script)
 
 
 shutil.copytree(source_path_resourses, target_path_resourses)
 shutil.copytree(source_path_pets, target_path_pets)
-shutil.copytree(source_path_script, target_path_script)
 # shutil.copy('./conf.json', './dist/conf.json')
-os.remove('./dist/script/script.py')
 # 虚拟环境下pyinstaller
-os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -w -i ./resourses/bitbug_favicon.ico DesktopPet.py")
+os.system("E:\Environment\Anaconda\envs\DesktopPet\Scripts\pyinstaller -F -w -i ./resourses/bitbug_favicon.ico DesktopPet.py --clean")
 
 print("打包zip文件")
 
