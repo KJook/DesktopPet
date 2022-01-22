@@ -17,31 +17,33 @@ def init_exe_icon(path):
     name = re.findall(r'[^\\/:*?"<>|\r\n]+$', path)[0].split('.')[0]
     if os.path.exists(savePath + name + '.png'):
         return savePath + name + '.png'
-    print()
-    large, small = win32gui.ExtractIconEx(path, 0)
-    win32gui.DestroyIcon(small[0])
-    hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
-    hbmp = win32ui.CreateBitmap()
-    ico_x = win32api.GetSystemMetrics(win32con.SM_CXICON)
-    ico_y = win32api.GetSystemMetrics(win32con.SM_CYICON)
-    hbmp.CreateCompatibleBitmap(hdc, ico_x, ico_y)
-    hdc = hdc.CreateCompatibleDC()
-    hdc.SelectObject(hbmp)
-    hdc.DrawIcon((0, 0), large[0])
-    # hbmp.SaveBitmapFile(hdc, savePath + name + '.bmp')
-    bmpstr = hbmp.GetBitmapBits(True)
-    img = Image.frombuffer(
-        'RGBA',
-        (ico_x, ico_y),
-        bmpstr, 'raw', 'BGRA', 0, 1
-    )
-    img.save(savePath + name + '.png')
-    return savePath + name + '.png'
+    try:
+        large, small = win32gui.ExtractIconEx(path, 0)
+        win32gui.DestroyIcon(small[0])
+        hdc = win32ui.CreateDCFromHandle(win32gui.GetDC(0))
+        hbmp = win32ui.CreateBitmap()
+        ico_x = win32api.GetSystemMetrics(win32con.SM_CXICON)
+        ico_y = win32api.GetSystemMetrics(win32con.SM_CYICON)
+        hbmp.CreateCompatibleBitmap(hdc, ico_x, ico_y)
+        hdc = hdc.CreateCompatibleDC()
+        hdc.SelectObject(hbmp)
+        hdc.DrawIcon((0, 0), large[0])
+        # hbmp.SaveBitmapFile(hdc, savePath + name + '.bmp')
+        bmpstr = hbmp.GetBitmapBits(True)
+        img = Image.frombuffer(
+            'RGBA',
+            (ico_x, ico_y),
+            bmpstr, 'raw', 'BGRA', 0, 1
+        )
+        img.save(savePath + name + '.png')
+        return savePath + name + '.png'
+    except:
+        return './resourses/star.png'
 
 
 def init_icon(url, name):
     path = './resourses/webicon'
-    m_path = './resourses/webicon/star.png'
+    m_path = './resourses/star.png'
     file_path = os.path.join(path, name + '.ico')
     if os.path.exists(file_path):
         return 0, file_path
