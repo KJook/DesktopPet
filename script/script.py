@@ -1,18 +1,23 @@
 import threading
-import subprocess
 import webbrowser
 import os
+import win32api
+    
+def runExe(path):
+    # fileName = os.path.basename(path)
+    # fileFolder = os.path.dirname(path)
+    # print(fi)
+    # x = os.popen('cd ' + fileFolder)
+    # print("-----------------")
+    # print(x.read())
+    # fileName = fileName.replace(".exe", "")
+    # os.system('.\\%s'%fileName)
+    win32api.ShellExecute(0, 'open', path, '', os.path.dirname(path), 1)
 
 def openExe(path):
-    # client_th = threading.Thread(target=subprocess.run, args=(path,))
-    # client_th.setDaemon(True)
-    # client_th.start()
-    my_path = os.getcwd()
-    run_path = os.path.dirname(path)
-    os.chdir(run_path)
-    subprocess.run(path)
-    os.chdir(my_path)
-
+        client_th = threading.Thread(target=runExe, args=(path,))
+        client_th.setDaemon(True)
+        client_th.start()
 
 def openUrl(url):
     client_th = threading.Thread(target=webbrowser.open, args=(url,))
