@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser
+from PyQt5.QtWidgets import QMainWindow, QLabel, QAction, qApp, QMenu, QSystemTrayIcon, QTextBrowser, QApplication
 from PyQt5 import QtMultimedia
 from PyQt5.QtCore import Qt, QTimer, QObject, pyqtSignal, QUrl
 from PyQt5.QtGui import QMovie, QIcon, QCursor, QFont
@@ -37,13 +37,13 @@ def playMeow():
 class root(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.petCostom = ['05', '06']
-        self.petHello = ['01']
-        self.petDrag = '08'
+        self.petCostom = ['stand2']
+        self.petHello = ['hello2']
+        self.petDrag = 'drag2'
         self.isMouseEnter = False
         self.is_follow_mouse = True
         self.mouse_drag_pos = self.pos()
-        self.petNum = random.randint(0, 2)
+        self.petNum = 0
         self.webIconList = []
         self.scriptIconList = []
         self.jsonDataInit()
@@ -94,8 +94,8 @@ class root(QMainWindow):
             "font-size:15px;color:white;background-color: rgba(25, 25, 25, 0.5);border:None")
 
         self.label = QLabel('', self)
-        self.label.resize(100, 100)
-        self.label.move(25, 50)
+        self.label.resize(150, 150)
+        self.label.move(0, 50)
 
         # 使pet在label中显示出来
         self.randomPet()
@@ -116,6 +116,8 @@ class root(QMainWindow):
         self.tray_icon.setContextMenu(self.tray_icon_menu)
         self.tray_icon.show()
         self.show()
+        d = QApplication.desktop()
+        self.move(d.width() - 200, 100)
 
     # 重新加载action
     def refreshConf(self):
