@@ -1,3 +1,4 @@
+import threading
 import requests
 from util.pathLoader import CONF_PATH
 import re
@@ -41,28 +42,37 @@ def init_exe_icon(path):
         return './resourses/star.png'
 
 
-def init_icon(url, name):
-    path = './resourses/webicon'
-    m_path = './resourses/star.png'
-    file_path = os.path.join(path, name + '.ico')
-    if os.path.exists(file_path):
-        return 0, file_path
+def download_icon(url, file_path):
     try:
         response = requests.get(
-            url, stream=True, timeout=(1, 10))  # stream=True必须写上
+            url, stream=True)  # stream=True必须写上
     except:
-        return -1, m_path
+        return -1
     chunk_size = 1024  # 每次下载的数据大小
     try:
         if response.status_code == 200:  # 判断是否响应成功
             with open(file_path, 'wb') as file:  # 显示进度条
                 for data in response.iter_content(chunk_size=chunk_size):
                     file.write(data)
-            return 0, file_path
+            return 0
         else:
-            return 2, m_path
+            return 2
     except Exception as e:
+        return 1
+
+
+def init_icon(url, name):
+    path = './resourses/webicon'
+    m_path = './resourses/star.png'
+    file_path = os.path.join(path, name + '.ico')
+    if os.path.exists(file_path):
+        return 0, file_path
+    else:
+        t = threading.Thread(target=download_icon, args=(url, file_path))
+        t.setDaemon(True)
+        t.start()
         return 1, m_path
+    
 
 
 def addWebSite(title, url, attr, gs):
